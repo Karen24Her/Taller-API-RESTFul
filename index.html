@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autenticación con JWT</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #output {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pruebas de Autenticación con JWT</h1>
+
+  <h3>Login</h3>
+  <input type="text" id="username" placeholder="Nombre de usuario">
+  <input type="password" id="password" placeholder="Contraseña">
+  <button onclick="login()">Iniciar Sesión</button>
+
+  <h3>Crear Zoológico</h3>
+<input type="text" id="zooName" placeholder="Nombre del Zoológico">
+<input type="text" id="zooLocation" placeholder="Ubicación del Zoológico">
+<button onclick="createZoo()">Crear Zoológico</button>
+
+<select id="zooSelect">
+  <option value="">Selecciona un zoológico</option>
+</select>
+
+<h3>Crear Animal en Zoológico Seleccionado</h3>
+<input type="text" id="animalName" placeholder="Nombre del Animal">
+<input type="text" id="animalSpecies" placeholder="Especie del Animal">
+<button onclick="createAnimal()">Crear Animal</button>
+
+<div id="output"></div>
+
+  <script>
+    let token = '';
+
+    async function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+    
+      const response = await fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })  // Verifica que el body esté bien formateado
+      });
+    
+      const data = await response.json();
+    
+      if (response.ok) {
+        token = data.token;
+        document.getElementById('output').innerText = `Token JWT: ${token}`;
+      } else {
+        document.getElementById('output').innerText = `Error: ${data.message}`;
+      }
+    }       
+
+    async function createZoo() {
+      if (!token) {
+        document.getElementById('output').innerText = 'Por favor, inicia sesión primero.';
+        return;
+      }
+    
+      const name = document.getElementById('zooName').value;
+      const location = document.getElementById('zooLocation').value;
+    
+      const response = await fetch('http://localhost:3000/api/zoos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name, location })
+      });
+    
+      const data = await response.json();
+    
+      if (response.ok) {
+        document.getElementById('output').innerText = `Zoológico creado: ${JSON.stringify(data, null, 2)}`;
+        // Llamar a la función para obtener y mostrar la lista de zoológicos
+        getZoos();
+      } else {
+        document.getElementById('output').innerText = `Error: ${data.message}`;
+      }
+    }
+
+    async function getZoos() {
+      if (!token) {
+        document.getElementById('output').innerText = 'Por favor, inicia sesión primero.';
+        return;
+      }
+    
+      const response = await fetch('http://localhost:3000/api/zoos', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+    
+      const data = await response.json();
+    
+      if (response.ok) {
+        const zooSelect = document.getElementById('zooSelect');
+        zooSelect.innerHTML = '';  // Limpiar opciones previas
+    
+        // Rellenar el select con los zoológicos existentes
+        data.forEach(zoo => {
+          const option = document.createElement('option');
+          option.value = zoo._id;
+          option.textContent = `${zoo.name} - ${zoo.location}`;
+          zooSelect.appendChild(option);
+        });
+    
+        document.getElementById('output').innerText = 'Lista de zoológicos actualizada.';
+      } else {
+        document.getElementById('output').innerText = `Error al obtener zoológicos: ${data.message}`;
+      }
+    }
+    
+    async function createAnimal() {
+      if (!token) {
+        document.getElementById('output').innerText = 'Por favor, inicia sesión primero.';
+        return;
+      }
+    
+      const zooId = document.getElementById('zooSelect').value;
+      const name = document.getElementById('animalName').value;
+      const species = document.getElementById('animalSpecies').value;
+    
+      if (!zooId) {
+        document.getElementById('output').innerText = 'Por favor, selecciona un zoológico.';
+        return;
+      }
+    
+      const response = await fetch(`http://localhost:3000/api/animals`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name, species, zoo: zooId })
+      });
+    
+      const data = await response.json();
+    
+      if (response.ok) {
+        document.getElementById('output').innerText = `Animal creado: ${JSON.stringify(data, null, 2)}`;
+      } else {
+        document.getElementById('output').innerText = `Error: ${data.message}`;
+      }
+    }    
+    
+  </script>
+</body>
+</html>
