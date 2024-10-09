@@ -29,3 +29,27 @@ module.exports = (app) => {
   // Configurar Swagger UI para servir la documentación en /api-docs
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 };
+
+/**
+ * @swagger
+ * /api/users:
+ *   post:
+ *     summary: Crear un nuevo usuario
+ *     tags: [Usuarios]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Usuario creado exitosamente
+ *       400:
+ *         description: Error al crear el usuario
+ */

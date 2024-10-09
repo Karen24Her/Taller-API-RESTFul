@@ -1,12 +1,13 @@
 const express = require('express');
-const { login } = require('../controllers/authController');
+const { User } = require('../models/userModel');
 const router = express.Router();
 
 /**
  * @swagger
- * /api/login:
+ * /api/users:
  *   post:
- *     summary: Inicia sesión y obtiene un token JWT
+ *     summary: Crear un nuevo usuario
+ *     tags: [Usuarios]
  *     requestBody:
  *       required: true
  *       content:
@@ -18,22 +19,31 @@ const router = express.Router();
  *                 type: string
  *               password:
  *                 type: string
- *             required:
- *               - username
- *               - password
  *     responses:
- *       200:
- *         description: Usuario autenticado con éxito y devuelve un token JWT
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *       401:
- *         description: Credenciales inválidas
+ *       201:
+ *         description: Usuario creado exitosamente
+ *       400:
+ *         description: Error al crear el usuario
  */
-router.post('/login', login);
+
+// Endpoint para crear un nuevo usuario
+router.post('/users', async (req, res) => {
+    try {
+        const newUser = new User(req.body);
+        await newUser.save();
+        res.status(201).send(newUser);
+    } catch (error) {
+        console.error('Error al crear el usuario:', error);
+        res.status(400).send({ error: 'Error al crear el usuario' });
+    }
+});
+
+
+// Endpoint para crear un nuevo post
+router.post('/posts', async (req, res) => {
+    const newPost = new Post(req.body);
+    await newPost.save();
+    res.status(201).send(newPost);
+});
 
 module.exports = router;

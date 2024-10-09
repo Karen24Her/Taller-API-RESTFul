@@ -44,7 +44,7 @@ const connectDB = async () => {
 };
 
 async function createDefaultUser() {
-  const username = 'karen';  // Define el nombre de usuario deseado
+  const username = 'Usuario';  // Define el nombre de usuario deseado
   const password = '$2a$10$Jw6nEENd19izFLMZ2TR9.O9Dp0bh3.hnjyLKs7pPbVUGcgSlyflUO';  // Reemplaza con el hash generado anteriormente
 
   try {
@@ -71,7 +71,24 @@ async function createDefaultUser() {
 // Llamar a la función para crear el usuario al iniciar el servidor
 createDefaultUser();
 
-connectDB();
+connectDB()
+    .then(() => {
+        createDefaultUser(); // Puedes llamar aquí o donde sea más apropiado
+        const PORT = process.env.PORT || 3000;
+        app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    })
+    .catch(err => {
+        console.error("No se pudo conectar a MongoDB", err);
+        process.exit(1);
+    });
+
+    const corsOptions = {
+      origin: 'http://localhost:3000', // Asegúrate de que esta sea la URL correcta de tu cliente
+      optionsSuccessStatus: 200 // Para algunos navegadores antiguos
+  };
+  
+  app.use(cors(corsOptions));
+  
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
