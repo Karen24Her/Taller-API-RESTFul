@@ -9,3 +9,4 @@ router.put('/:id', auth, updateZoo);
 router.delete('/:id', auth, deleteZoo);  
 
 module.exports = router;
+
