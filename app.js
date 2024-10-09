@@ -25,6 +25,13 @@ app.use('/api/zoos', zooRoutes);
 app.use('/api/animals', animalRoutes);
 app.use('/api', authRoutes);
 
+// Ruta para la raíz ("/") - Muestra un mensaje o redirige a Swagger
+app.get('/', (req, res) => {
+  res.send('Bienvenido a la API de Zoológicos y Animales');
+  // Si prefieres redirigir a Swagger, puedes usar esta línea en su lugar:
+   res.redirect('/api-docs');  // Cambia '/api-docs' por la ruta real de tu documentación Swagger
+});
+
 // Conexión a la base de datos
 const connectDB = async () => {
   try {
@@ -66,5 +73,5 @@ createDefaultUser();
 
 connectDB();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
