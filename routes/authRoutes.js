@@ -38,7 +38,6 @@ router.post('/users', async (req, res) => {
     }
 });
 
-
 // Endpoint para crear un nuevo post
 router.post('/posts', async (req, res) => {
     const newPost = new Post(req.body);
