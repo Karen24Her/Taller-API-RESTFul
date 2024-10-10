@@ -7,6 +7,7 @@ const zooRoutes = require('./routes/zooRoutes');
 const animalRoutes = require('./routes/animalRoutes');
 const authRoutes = require('./routes/authRoutes');
 const User = require('./models/userModel');
+const authMiddleware = require('./middlewares/auth'); // Ajuste aquí
 
 dotenv.config();
 
@@ -25,8 +26,7 @@ app.use(express.json());
 swaggerDocs(app);
 
 // Rutas
-app.use('/api/zoos', authMiddleware, zooRoutes);
-app.use('/api/zoos', zooRoutes);
+app.use('/api/zoos', authMiddleware, zooRoutes); // Elimina la línea duplicada
 app.use('/api/animals', animalRoutes);
 app.use('/api', authRoutes);
 
@@ -36,8 +36,8 @@ const connectDB = async () => {
     await mongoose.connect(process.env.DB_CONNECTION, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000, // Tiempo de espera para la selección del servidor
-      socketTimeoutMS: 45000, // Tiempo de espera para operaciones de socket
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
     });
     console.log('Connected to DB');
   } catch (err) {
