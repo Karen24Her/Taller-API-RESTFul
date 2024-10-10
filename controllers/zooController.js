@@ -4,8 +4,19 @@ const Animal = require('../models/animalModel');
 // Obtener todos los zoológicos
 exports.getZoos = async (req, res) => {
   try {
-    const zoos = await Zoo.find().populate('animals');
+    const zoos = await Zoo.find();
     res.json(zoos);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Obtener un zoológico específico
+exports.getZoo = async (req, res) => {
+  try {
+    const zoo = await Zoo.findById(req.params.id);
+    if (!zoo) return res.status(404).json({ message: 'Zoológico no encontrado' });
+    res.json(zoo);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -16,6 +27,8 @@ exports.createZoo = async (req, res) => {
   const zoo = new Zoo({
     name: req.body.name,
     location: req.body.location,
+    geoExtension: req.body.geoExtension,
+    animalCapacity: req.body.animalCapacity
   });
 
   try {
@@ -29,7 +42,8 @@ exports.createZoo = async (req, res) => {
 // Actualizar un zoológico
 exports.updateZoo = async (req, res) => {
   try {
-    const updatedZoo = await Zoo.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updatedZoo = await Zoo.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    if (!updatedZoo) return res.status(404).json({ message: 'Zoológico no encontrado' });
     res.json(updatedZoo);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -39,8 +53,9 @@ exports.updateZoo = async (req, res) => {
 // Eliminar un zoológico
 exports.deleteZoo = async (req, res) => {
   try {
-    await Zoo.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Zoo eliminado' });
+    const deletedZoo = await Zoo.findByIdAndDelete(req.params.id);
+    if (!deletedZoo) return res.status(404).json({ message: 'Zoológico no encontrado' });
+    res.json({ message: 'Zoológico eliminado exitosamente' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

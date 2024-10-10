@@ -25,6 +25,7 @@ app.use(express.json());
 swaggerDocs(app);
 
 // Rutas
+app.use('/api/zoos', authMiddleware, zooRoutes);
 app.use('/api/zoos', zooRoutes);
 app.use('/api/animals', animalRoutes);
 app.use('/api', authRoutes);

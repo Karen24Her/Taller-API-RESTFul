@@ -1,5 +1,5 @@
 const express = require('express');
-const { getZoos, createZoo, updateZoo, deleteZoo } = require('../controllers/zooController');
+const { getZoos, getZoo, createZoo, updateZoo, deleteZoo } = require('../controllers/zooController');
 const auth = require('../middlewares/auth');
 const router = express.Router();
 
@@ -16,12 +16,49 @@ router.get('/', auth, getZoos);
 
 /**
  * @swagger
+ * /api/zoos/{id}:
+ *   get:
+ *     summary: Obtiene un zoológico específico
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID del zoológico
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Detalles del zoológico
+ *       404:
+ *         description: Zoológico no encontrado
+ */
+router.get('/:id', auth, getZoo);
+
+/**
+ * @swagger
  * /api/zoos:
  *   post:
  *     summary: Crea un nuevo zoológico
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               location:
+ *                 type: string
+ *               geoExtension:
+ *                 type: string
+ *               animalCapacity:
+ *                 type: number
  *     responses:
  *       201:
  *         description: Zoológico creado
+ *       400:
+ *         description: Error en la creación del zoológico
  */
 router.post('/', auth, createZoo);
 
@@ -37,9 +74,26 @@ router.post('/', auth, createZoo);
  *         description: ID del zoológico
  *         schema:
  *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               location:
+ *                 type: string
+ *               geoExtension:
+ *                 type: string
+ *               animalCapacity:
+ *                 type: number
  *     responses:
  *       200:
  *         description: Zoológico actualizado
+ *       404:
+ *         description: Zoológico no encontrado
  */
 router.put('/:id', auth, updateZoo);
 
@@ -58,8 +112,9 @@ router.put('/:id', auth, updateZoo);
  *     responses:
  *       200:
  *         description: Zoológico eliminado
+ *       404:
+ *         description: Zoológico no encontrado
  */
 router.delete('/:id', auth, deleteZoo);
 
 module.exports = router;
-
