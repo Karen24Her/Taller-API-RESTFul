@@ -29,7 +29,23 @@ app.use('/api/zoos', zooRoutes);
 app.use('/api/animals', animalRoutes);
 app.use('/api', authRoutes);
 
-// ... (resto del código de conexión a la base de datos y creación de usuario por defecto)
+// Conexión a MongoDB con opciones adicionales
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.DB_CONNECTION, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000, // Tiempo de espera para la selección del servidor
+      socketTimeoutMS: 45000, // Tiempo de espera para operaciones de socket
+    });
+    console.log('Connected to DB');
+  } catch (err) {
+    console.error('Failed to connect to MongoDB', err);
+    process.exit(1);
+  }
+};
+
+connectDB();
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

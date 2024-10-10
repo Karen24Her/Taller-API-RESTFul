@@ -29,20 +29,25 @@ const router = express.Router();
 // Endpoint para crear un nuevo usuario
 router.post('/users', async (req, res) => {
     try {
-        const newUser = new User(req.body);
+        const { username, password } = req.body;
+        
+        if (!username || !password) {
+            return res.status(400).json({ error: 'Se requieren username y password' });
+        }
+        
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            return res.status(400).json({ error: 'El usuario ya existe' });
+        }
+        
+        const newUser = new User({ username, password });
         await newUser.save();
-        res.status(201).send(newUser);
+        
+        res.status(201).json({ message: 'Usuario creado exitosamente', user: newUser });
     } catch (error) {
         console.error('Error al crear el usuario:', error);
-        res.status(400).send({ error: 'Error al crear el usuario' });
+        res.status(400).json({ error: 'Error al crear el usuario', details: error.message });
     }
-});
-
-// Endpoint para crear un nuevo post
-router.post('/posts', async (req, res) => {
-    const newPost = new Post(req.body);
-    await newPost.save();
-    res.status(201).send(newPost);
 });
 
 module.exports = router;
