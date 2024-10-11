@@ -59,7 +59,7 @@ router.post('/', authMiddleware, async (req, res) => {
 
 /**
  * @swagger
- * /zoos:
+ * /api/zoos:
  *   get:
  *     summary: Obtener todos los zoológicos
  *     tags: [Zoos]
@@ -82,7 +82,7 @@ router.get('/', authMiddleware, async (req, res) => {
 
 /**
  * @swagger
- * /zoos/{id}:
+ * /api/zoos/{id}:
  *   get:
  *     summary: Obtener un zoológico por ID
  *     tags: [Zoos]
@@ -117,7 +117,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
 
 /**
  * @swagger
- * /zoos/{id}:
+ * /api/zoos/{id}:
  *   put:
  *     summary: Actualizar un zoológico por ID
  *     tags: [Zoos]
@@ -158,7 +158,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
 
 /**
  * @swagger
- * /zoos/{id}:
+ * /api/zoos/{id}:
  *   delete:
  *     summary: Eliminar un zoológico por ID
  *     tags: [Zoos]
