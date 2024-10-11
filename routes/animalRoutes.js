@@ -48,12 +48,12 @@ const router = express.Router();
  *         description: Error al crear el animal
  */
 router.post('/', authMiddleware, async (req, res) => {
-    const { name, species, zooId } = req.body;
+    const { name, species, zoo } = req.body;
 
     try {
         // Verificar si el zoológico existe
-        const zoo = await Zoo.findById(zooId);
-        if (!zoo) {
+        const foundZoo = await Zoo.findById(zoo);
+        if (!foundZoo) {
             return res.status(404).json({ message: 'Zoológico no encontrado' });
         }
 
@@ -61,7 +61,7 @@ router.post('/', authMiddleware, async (req, res) => {
         const newAnimal = new Animal({
             name,
             species,
-            zoo: zooId
+            zoo: foundZoo._id
         });
 
         await newAnimal.save();
