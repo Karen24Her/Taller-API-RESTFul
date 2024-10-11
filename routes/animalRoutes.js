@@ -72,6 +72,52 @@ router.post('/', authMiddleware, async (req, res) => {
     }
 });
 
+
+
+/**
+ * @swagger
+ * /api/animals/zoo/{zooId}:
+ *   get:
+ *     summary: Obtener todos los animales asociados a un zoológico
+ *     tags: [Animales]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: zooId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: El ID del zoológico
+ *     responses:
+ *       200:
+ *         description: Lista de animales del zoológico
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Animal'
+ *       404:
+ *         description: No se encontraron animales para este zoológico
+ *       500:
+ *         description: Error al obtener los animales
+ */
+router.get('/zoo/:zooId', authMiddleware, async (req, res) => {
+    try {
+        const animals = await Animal.find({ zoo: req.params.zooId }).populate('zoo', 'name location');
+        if (animals.length === 0) {
+            return res.status(404).json({ message: 'No se encontraron animales para este zoológico' });
+        }
+        res.status(200).json(animals);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener los animales', error: error.message });
+    }
+});
+
+
+
+
 /**
  * @swagger
  * /animals:
