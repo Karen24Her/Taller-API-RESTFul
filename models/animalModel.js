@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+
 const animalSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -12,8 +13,9 @@ const animalSchema = new mongoose.Schema({
   zoo: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Zoo',
-    required: true // Cada animal debe estar asociado a un zoológico
+    required: false // Cada animal debe estar asociado a un zoológico, opcional
   }
 });
 
-module.exports = mongoose.model('Animal', animalSchema);
+const Animal = mongoose.model('Animal', animalSchema);
+module.exports = Animal;

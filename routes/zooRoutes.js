@@ -1,6 +1,7 @@
 const express = require('express');
 const Zoo = require('../models/zooModel');  // Modelo de Zoo
 const authMiddleware = require('../middlewares/auth');  // Middleware de autenticación JWT
+const Animal = require('../models/animalModel'); // Asegúrate de que el path es correcto
 
 const router = express.Router();
 
@@ -48,14 +49,31 @@ const router = express.Router();
  *         description: Error al crear el zoológico
  */
 router.post('/', authMiddleware, async (req, res) => {
+    const { name, location, animals } = req.body;
+
     try {
-        const newZoo = new Zoo(req.body);
+        // Verificar que los IDs de animales existan
+        const foundAnimals = await Animal.find({ '_id': { $in: animals } });
+
+        if (foundAnimals.length !== animals.length) {
+            return res.status(400).json({ message: 'Uno o más animales no existen en la base de datos' });
+        }
+
+        // Crear el nuevo zoológico
+        const newZoo = new Zoo({
+            name,
+            location,
+            animals: foundAnimals.map(animal => animal._id)  // Solo asignar los IDs que existen
+        });
+
         await newZoo.save();
         res.status(201).json(newZoo);
+
     } catch (error) {
         res.status(400).json({ message: 'Error al crear el zoológico', error: error.message });
     }
 });
+
 
 /**
  * @swagger

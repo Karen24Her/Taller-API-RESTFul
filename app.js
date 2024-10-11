@@ -27,6 +27,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use('/api/zoos', authMiddleware, zooRoutes);
 app.use('/api/animals', authMiddleware, animalRoutes);
 app.use('/api', authRoutes);
+app.use('/api/auth', authRoutes)
+//app.use('/api/animals/no-zoo')
 
 // Conexión a MongoDB
 const connectDB = async () => {

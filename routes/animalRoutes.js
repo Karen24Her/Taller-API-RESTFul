@@ -5,6 +5,7 @@ const authMiddleware = require('../middlewares/auth'); // Middleware de autentic
 
 const router = express.Router();
 
+
 /**
  * @swagger
  * components:
@@ -26,6 +27,56 @@ const router = express.Router();
  *           type: string
  *           description: El ID del zoológico al que pertenece
  */
+
+/**
+ * @swagger
+ * /api/animals/no-zoo:
+ *   post:
+ *     summary: Crear un nuevo animal sin asociación a un zoológico
+ *     tags: [Animales]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Nombre del animal
+ *               species:
+ *                 type: string
+ *                 description: Especie del animal
+ *     responses:
+ *       201:
+ *         description: Animal creado exitosamente
+ *       400:
+ *         description: Error al crear el animal
+ */
+router.post('/no-zoo', async (req, res) => {
+    const { name, species } = req.body;
+
+    // Verificar que los campos requeridos estén presentes
+    if (!name || !species) {
+        return res.status(400).json({ message: 'Faltan campos requeridos: name y species' });
+    }
+
+    try {
+        // Crear el nuevo animal sin asociación a un zoológico
+        const newAnimal = new Animal({
+            name,
+            species,
+        });
+
+        await newAnimal.save();
+        res.status(201).json(newAnimal);
+    } catch (error) {
+        res.status(400).json({ message: 'Error al crear el animal', error: error.message });
+    }
+});
+
+
+
 
 /**
  * @swagger
