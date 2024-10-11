@@ -1,10 +1,18 @@
 const mongoose = require('mongoose');
 
 const zooSchema = new mongoose.Schema({
-  name: String,
-  location: String,
-  geoExtension: String,  // Extensión geográfica
-  animalCapacity: Number // Capacidad de animales
+  name: {
+    type: String,
+    required: true
+  },
+  location: {
+    type: String,
+    required: true
+  },
+  animals: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Animal'
+  }]
 });
 
 module.exports = mongoose.model('Zoo', zooSchema);

@@ -2,12 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const swaggerDocs = require('./swagger');
+const { swaggerUi, swaggerDocs } = require('./swagger');
 const zooRoutes = require('./routes/zooRoutes');
 const animalRoutes = require('./routes/animalRoutes');
 const authRoutes = require('./routes/authRoutes');
-const User = require('./models/userModel');
-const authMiddleware = require('./middlewares/auth'); // Ajuste aquí
+const authMiddleware = require('./middlewares/auth');
 
 dotenv.config();
 
@@ -15,22 +14,21 @@ const app = express();
 
 // Configuración de CORS
 const corsOptions = {
-  origin: 'http://localhost:3000', // Ajusta esto a la URL de tu cliente
+  origin: 'http://localhost:3000',
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
-
 app.use(express.json());
 
 // Swagger documentation
-swaggerDocs(app);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-// Rutas
-app.use('/api/zoos', authMiddleware, zooRoutes); // Elimina la línea duplicada
-app.use('/api/animals', animalRoutes);
+// Rutas protegidas con JWT
+app.use('/api/zoos', authMiddleware, zooRoutes);
+app.use('/api/animals', authMiddleware, animalRoutes);
 app.use('/api', authRoutes);
 
-// Conexión a MongoDB con opciones adicionales
+// Conexión a MongoDB
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.DB_CONNECTION, {

@@ -1,6 +1,26 @@
 const express = require('express');
-const { User } = require('../models/userModel');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const {User} = require('../models/userModel');
 const router = express.Router();
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - username
+ *         - password
+ *       properties:
+ *         username:
+ *           type: string
+ *           description: Nombre de usuario
+ *         password:
+ *           type: string
+ *           description: Contraseña del usuario
+ */
 
 /**
  * @swagger
@@ -13,40 +33,27 @@ const router = express.Router();
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *               password:
- *                 type: string
+ *             $ref: '#/components/schemas/User'
  *     responses:
  *       201:
- *         description: Usuario creado exitosamente
+ *         description: Usuario creado exitosamente y se ha generado el token JWT
  *       400:
- *         description: Error al crear el usuario
+ *         description: Error al registrar el usuario
  */
-
-// Endpoint para crear un nuevo usuario
 router.post('/users', async (req, res) => {
+    const { username, password } = req.body;
+
     try {
-        const { username, password } = req.body;
-        
-        if (!username || !password) {
-            return res.status(400).json({ error: 'Se requieren username y password' });
-        }
-        
-        const existingUser = await User.findOne({ username });
-        if (existingUser) {
-            return res.status(400).json({ error: 'El usuario ya existe' });
-        }
-        
-        const newUser = new User({ username, password });
+        // Hashear la contraseña
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = new User({ username, password: hashedPassword });
         await newUser.save();
-        
-        res.status(201).json({ message: 'Usuario creado exitosamente', user: newUser });
+
+        // Crear el token JWT
+        const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.status(201).json({ token });
     } catch (error) {
-        console.error('Error al crear el usuario:', error);
-        res.status(400).json({ error: 'Error al crear el usuario', details: error.message });
+        res.status(400).json({ message: 'Error al registrar el usuario', error: error.message });
     }
 });
 

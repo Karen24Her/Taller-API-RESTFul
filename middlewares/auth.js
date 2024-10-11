@@ -1,6 +1,9 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 
+/**
+ * Middleware para verificar el token JWT
+ */
 const authMiddleware = (req, res, next) => {
     const token = req.headers['authorization'];
 
@@ -10,7 +13,7 @@ const authMiddleware = (req, res, next) => {
 
     try {
         const verified = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET);
-        req.user = verified; // Guardar el usuario verificado en la solicitud
+        req.user = verified;
         next();
     } catch (error) {
         return res.status(400).json({ message: 'Token no válido' });
