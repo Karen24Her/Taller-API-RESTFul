@@ -48,13 +48,13 @@ const router = express.Router();
  *         description: Error al crear el animal
  */
 router.post('/', authMiddleware, async (req, res) => {
-    const { name, species, zoo } = req.body;
+    const {name, species, zoo} = req.body;
 
     try {
         // Verificar si el zoológico existe
         const foundZoo = await Zoo.findById(zoo);
         if (!foundZoo) {
-            return res.status(404).json({ message: 'Zoológico no encontrado' });
+            return res.status(404).json({message: 'Zoológico no encontrado'});
         }
 
         // Crear el nuevo animal asociado al zoológico
@@ -68,10 +68,9 @@ router.post('/', authMiddleware, async (req, res) => {
 
         res.status(201).json(newAnimal);
     } catch (error) {
-        res.status(400).json({ message: 'Error al crear el animal', error: error.message });
+        res.status(400).json({message: 'Error al crear el animal', error: error.message});
     }
 });
-
 
 
 /**
@@ -105,48 +104,22 @@ router.post('/', authMiddleware, async (req, res) => {
  */
 router.get('/zoo/:zooId', authMiddleware, async (req, res) => {
     try {
-        const animals = await Animal.find({ zoo: req.params.zooId }).populate('zoo', 'name location');
+        const animals = await Animal.find({zoo: req.params.zooId}).populate('zoo', 'name location');
         if (animals.length === 0) {
-            return res.status(404).json({ message: 'No se encontraron animales para este zoológico' });
+            return res.status(404).json({message: 'No se encontraron animales para este zoológico'});
         }
         res.status(200).json(animals);
     } catch (error) {
-        res.status(500).json({ message: 'Error al obtener los animales', error: error.message });
+        res.status(500).json({message: 'Error al obtener los animales', error: error.message});
     }
 });
 
 
-
-
 /**
  * @swagger
- * /animals:
+ * /api/animals/{id}:
  *   get:
- *     summary: Obtener todos los animales
- *     tags: [Animales]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Lista de todos los animales
- *       500:
- *         description: Error al obtener los animales
- */
-router.get('/', authMiddleware, async (req, res) => {
-    try {
-        // Obtener todos los animales y popular el zoológico asociado
-        const animals = await Animal.find().populate('zoo', 'name location');
-        res.json(animals);
-    } catch (error) {
-        res.status(500).json({ message: 'Error al obtener los animales', error: error.message });
-    }
-});
-
-/**
- * @swagger
- * /animals/{id}:
- *   get:
- *     summary: Obtener un animal por ID
+ *     summary: Obtener un animal por ID asociado a un zoológico
  *     tags: [Animales]
  *     security:
  *       - bearerAuth: []
@@ -160,6 +133,10 @@ router.get('/', authMiddleware, async (req, res) => {
  *     responses:
  *       200:
  *         description: Animal encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Animal'
  *       404:
  *         description: Animal no encontrado
  *       500:
@@ -167,22 +144,22 @@ router.get('/', authMiddleware, async (req, res) => {
  */
 router.get('/:id', authMiddleware, async (req, res) => {
     try {
-        // Obtener un animal por su ID y popular el zoológico asociado
         const animal = await Animal.findById(req.params.id).populate('zoo', 'name location');
         if (!animal) {
-            return res.status(404).json({ message: 'Animal no encontrado' });
+            return res.status(404).json({message: 'Animal no encontrado'});
         }
-        res.json(animal);
+        res.status(200).json(animal);
     } catch (error) {
-        res.status(500).json({ message: 'Error al obtener el animal', error: error.message });
+        res.status(500).json({message: 'Error al obtener el animal', error});
     }
 });
 
+
 /**
  * @swagger
- * /animals/{id}:
+ * /api/animals/{id}:
  *   put:
- *     summary: Actualizar un animal por ID
+ *     summary: Actualizar un animal por ID asociado a un zoológico
  *     tags: [Animales]
  *     security:
  *       - bearerAuth: []
@@ -204,41 +181,34 @@ router.get('/:id', authMiddleware, async (req, res) => {
  *         description: Animal actualizado
  *       404:
  *         description: Animal no encontrado
- *       400:
+ *       500:
  *         description: Error al actualizar el animal
  */
 router.put('/:id', authMiddleware, async (req, res) => {
-    const { name, species, zooId } = req.body;
-
+    const {name, species, zoo} = req.body;
     try {
-        // Verificar si el zoológico existe
-        const zoo = await Zoo.findById(zooId);
-        if (!zoo) {
-            return res.status(404).json({ message: 'Zoológico no encontrado' });
+        //verificar si el zoologico existe
+        const foundZoo = await Zoo.findById(zoo)
+        if (!foundZoo) {
+            return res.status(404).json({message: 'zoologico no encontrado'});
         }
 
-        // Actualizar el animal
-        const updatedAnimal = await Animal.findByIdAndUpdate(req.params.id, {
-            name,
-            species,
-            zoo: zooId
-        }, { new: true });
-
-        if (!updatedAnimal) {
-            return res.status(404).json({ message: 'Animal no encontrado' });
+        // Actualizar el animal asociado al zoológico
+        const animal = await Animal.findByIdAndUpdate(req.params.id, {name, species, zoo: foundZoo._id}, {new: true});
+        if (!animal) {
+            return res.status(404).json({message: 'Animal no encontrado'});
         }
-
-        res.json(updatedAnimal);
+        res.status(200).json(animal);
     } catch (error) {
-        res.status(400).json({ message: 'Error al actualizar el animal', error: error.message });
+        res.status(500).json({message: 'Error al actualizar el animal', error});
     }
 });
 
 /**
  * @swagger
- * /animals/{id}:
+ * /api/animals/{id}:
  *   delete:
- *     summary: Eliminar un animal por ID
+ *     summary: Eliminar un animal por ID asociado a un zoológico
  *     tags: [Animales]
  *     security:
  *       - bearerAuth: []
@@ -257,16 +227,27 @@ router.put('/:id', authMiddleware, async (req, res) => {
  *       500:
  *         description: Error al eliminar el animal
  */
+
 router.delete('/:id', authMiddleware, async (req, res) => {
     try {
-        const deletedAnimal = await Animal.findByIdAndDelete(req.params.id);
-        if (!deletedAnimal) {
+        const animal = await Animal.findById(req.params.id);
+        if (!animal) {
             return res.status(404).json({ message: 'Animal no encontrado' });
         }
-        res.json({ message: 'Animal eliminado exitosamente' });
+
+        // Verificar si el zoológico asociado al animal existe
+        const zoo = await Zoo.findById(animal.zoo);
+        if (!zoo) {
+            return res.status(404).json({ message: 'Zoológico no encontrado' });
+        }
+
+        await Animal.findByIdAndDelete(req.params.id);
+
+        res.status(200).json({ message: 'Animal eliminado exitosamente' });
     } catch (error) {
-        res.status(500).json({ message: 'Error al eliminar el animal', error: error.message });
+        res.status(500).json({ message: 'Error al eliminar el animal', error });
     }
 });
+
 
 module.exports = router;
