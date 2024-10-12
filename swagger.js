@@ -11,7 +11,8 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: "http://localhost:3000",
+        url: "https://taller-api-restful.onrender.com",  // Cambia esta URL por la de tu API en Render
+        description: "API de producción en Render"
       },
     ],
     components: {
