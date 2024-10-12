@@ -25,7 +25,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Ruta raíz (ruta principal de tu aplicación)
 app.get('/', (req, res) => {
-  res.send('Bienvenido a la API del Zoológico');
+  res.redirect('/api-docs');
 });
 
 // Rutas protegidas con JWT
@@ -51,5 +51,5 @@ const connectDB = async () => {
 connectDB();
 
 // Puerto de escucha del servidor
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
