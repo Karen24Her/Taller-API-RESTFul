@@ -14,7 +14,7 @@ const app = express();
 
 // Configuración de CORS
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: '*',
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
@@ -23,19 +23,21 @@ app.use(express.json());
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
+// Ruta raíz (ruta principal de tu aplicación)
+app.get('/', (req, res) => {
+  res.send('Bienvenido a la API del Zoológico');
+});
+
 // Rutas protegidas con JWT
 app.use('/api/zoos', authMiddleware, zooRoutes);
 app.use('/api/animals', authMiddleware, animalRoutes);
 app.use('/api', authRoutes);
-app.use('/api/auth', authRoutes)
-//app.use('/api/animals/no-zoo')
+app.use('/api/auth', authRoutes);
 
 // Conexión a MongoDB
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.DB_CONNECTION, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
     });
@@ -48,5 +50,6 @@ const connectDB = async () => {
 
 connectDB();
 
-const PORT = process.env.PORT || 3001;
+// Puerto de escucha del servidor
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
