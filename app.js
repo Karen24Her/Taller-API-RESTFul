@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
 app.use('/api/zoos', authMiddleware, zooRoutes);
 app.use('/api/animals', authMiddleware, animalRoutes);
 app.use('/api', authRoutes);
-app.use('/api/auth', authRoutes);
+//app.use('/api/auth', authRoutes);
 
 // Conexión a MongoDB
 const connectDB = async () => {

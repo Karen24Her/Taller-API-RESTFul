@@ -1,5 +1,6 @@
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const https = require("node:https");
 
 const swaggerOptions = {
   swaggerDefinition: {
@@ -11,7 +12,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: "https://taller-api-restful-izu0.onrender.com",  // Cambia esta URL por la de tu API en Render
+        url:"https://taller-api-restful-izu0.onrender.com", //"http://localhost:3001",  // Cambia esta URL por la de tu API en Render
         description: "API de producción en Render"
       },
     ],
